@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proving Grounds - Enhanced Prototype</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #ff6b35;
+            --secondary: #004e89;
+            --accent: #ffd23f;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --light: #ffffff;
+            --gray: #333333;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --warning: #ffaa00;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary)20, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
+        }
+        
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px var(--primary)40;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--accent);
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 30px;
+            background: var(--gray);
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .nav button {
+            padding: 15px 30px;
+            background: transparent;
+            color: var(--light);
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav button:hover::before {
+            left: 100%;
+        }
+        
+        .nav button.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--light);
+            box-shadow: 0 5px 15px var(--primary)40;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fighter-card {
+            background: linear-gradient(135deg, var(--gray) 0%, #2a2a2a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 1px solid var(--primary)30;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fighter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+        }
+        
+        .fighter-header {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .fighter-avatar {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary)20, var(--secondary)20);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            border: 2px solid var(--primary)50;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fighter-avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, var(--primary)10, transparent);
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .fighter-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .fighter-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .fighter-style {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .fighter-record {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .fighter-cash {
+            font-size: 1.2rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--primary)20;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-color: var(--primary)60;
+        }
+        
+        .stat-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .stat-bar {
+            background: #1a1a1a;
+            height: 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 15px;
+            transition: width 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: statShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes statShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-top: 10px;
+        }
+        
+        .creation-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .form-input {
+            padding: 15px;
+            background: #1a1a1a;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            color: var(--light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary)30;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--light);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--primary)40;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .training-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .training-allocation {
+            background: var(--gray);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--primary)30;
+        }
+        
+        .hours-display {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary)20, var(--secondary)20);
+            border-radius: 15px;
+        }
+        
+        .hours-available {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .slider-group {
+            margin: 20px 0;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 15px;
+            border: 1px solid var(--primary)20;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .slider-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .slider-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--primary)50;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px var(--primary)50;
+        }
+        
+        .training-effects {
+            background: var(--gray);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--warning)30;
+        }
+        
+        .effect-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid var(--warning);
+            background: var(--warning)10;
+        }
+        
+        .fight-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .tactics-panel {
+            background: var(--gray);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--primary)30;
+        }
+        
+        .opponent-panel {
+            background: var(--gray);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--danger)30;
+        }
+        
+        .fight-arena {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--primary)50;
+            margin-top: 20px;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fight-arena::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, var(--primary)10 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--secondary)10 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .fight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .fighter-corner {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: var(--primary)20;
+            border: 1px solid var(--primary)50;
+        }
+        
+        .vs-indicator {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent)50;
+        }
+        
+        .health-bars {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        
+        .health-bar {
+            flex: 1;
+            background: #1a1a1a;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--success)50;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+        
+        .fight-log {
+            background: #0a0a0a;
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border: 1px solid var(--primary)30;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .fight-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .fight-log::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+        
+        .fight-log::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            animation: logAppear 0.3s ease-in-out;
+        }
+        
+        @keyframes logAppear {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .log-damage {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .log-round {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: var(--primary)20;
+            border-radius: 10px;
+        }
+        
+        .standings-table {
+            background: var(--gray);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        
+        .standings-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .standings-table th {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .standings-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--primary)20;
+            transition: background 0.3s ease;
+        }
+        
+        .standings-table tr:hover td {
+            background: var(--primary)10;
+        }
+        
+        .rank-1 {
+            background: linear-gradient(90deg, var(--accent)20, transparent);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--primary)30;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: var(--light);
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            background: linear-gradient(45deg, var(--success), #00cc66);
+        }
+        
+        .notification.error {
+            background: linear-gradient(45deg, var(--danger), #cc0033);
+        }
+        
+        .notification.warning {
+            background: linear-gradient(45deg, var(--warning), #cc8800);
+        }
+        
+        @media (max-width: 768px) {
+            .fighter-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .fighter-avatar {
+                margin: 0 auto;
+            }
+            
+            .training-container,
+            .fight-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .creation-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav {
+                flex-wrap: wrap;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">PROVING GROUNDS</h1>
+            <p class="tagline">FANTASY COMBAT SPORTS MANAGEMENT</p>
+        </div>
+
+        <div class="nav">
+            <button onclick="showSection('fighter')" class="active" data-section="fighter">
+                🥊 FIGHTER
+            </button>
+            <button onclick="showSection('training')" data-section="training">
+                💪 TRAINING
+            </button>
+            <button onclick="showSection('fight')" data-section="fight">
+                ⚔️ FIGHT
+            </button>
+            <button onclick="showSection('league')" data-section="league">
+                🏆 LEAGUE
+            </button>
+        </div>
+
+        <!-- Fighter Section -->
+        <div id="fighter" class="section active">
+            <div class="fighter-card">
+                <div class="fighter-header">
+                    <div class="fighter-avatar" id="fighterAvatar">
+                        🥊
+                    </div>
+                    <div class="fighter-info">
+                        <div class="fighter-name" id="fighterName">Create Your Fighter</div>
+                        <div class="fighter-style" id="fighterStyle">Select Style</div>
+                        <div class="fighter-record">Record: <span id="record">0-0-0</span></div>
+                        <div class="fighter-cash">Cash: $<span id="cash">500</span></div>
+                    </div>
+                </div>
+                
+                <div class="creation-form">
+                    <input type="text" id="nameInput" class="form-input" placeholder="Enter Fighter Name" maxlength="20">
+                    <select id="styleSelect" class="form-input">
+                        <option value="">Select Fighting Style</option>
+                        <option value="Boxer">🥊 Boxer - Speed & Skill Focus</option>
+                        <option value="Wrestler">🤼 Wrestler - Strength & Endurance</option>
+                        <option value="BJJ">🥋 BJJ - Technical Submission Expert</option>
+                        <option value="Kickboxer">🦵 Kickboxer - Balanced Striker</option>
+                        <option value="Pressure">💥 Pressure Fighter - Relentless Aggression</option>
+                        <option value="Counter">🎯 Counter Fighter - Tactical Precision</option>
+                    </select>
+                    <button class="btn" onclick="createFighter()">CREATE FIGHTER</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-name">💪 STRENGTH</div>
+                        <div class="stat-bar">
+                            <div id="strengthBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="strengthValue">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-name">⚡ SPEED</div>
+                        <div class="stat-bar">
+                            <div id="speedBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="speedValue">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-name">🎯 SKILL</div>
+                        <div class="stat-bar">
+                            <div id="skillBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="skillValue">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-name">🫁 ENDURANCE</div>
+                        <div class="stat-bar">
+                            <div id="enduranceBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="enduranceValue">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-name">🛡️ CHIN</div>
+                        <div class="stat-bar">
+                            <div id="chinBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="chinValue">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-name">🧠 FIGHT IQ</div>
+                        <div class="stat-bar">
+                            <div id="fightIQBar" class="stat-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="stat-value" id="fightIQValue">50</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Section -->
+        <div id="training" class="section">
+            <div class="training-container">
+                <div class="training-allocation">
+                    <h2 style="text-align: center; margin-bottom: 20px; color: var(--accent);">⚡ TRAINING ALLOCATION</h2>
+                    
+                    <div class="hours-display">
+                        <div style="font-size: 1.2rem; margin-bottom: 10px;">Available Hours</div>
+                        <div class="hours-available" id="availableHours">50</div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">💪 Strength Training</span>
+                            <span class="slider-value" id="strengthHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="strengthSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">⚡ Speed Training</span>
+                            <span class="slider-value" id="speedHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="speedSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🎯 Skill Training</span>
+                            <span class="slider-value" id="skillHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="skillSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🫁 Endurance Training</span>
+                            <span class="slider-value" id="enduranceHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="enduranceSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🛡️ Chin Training</span>
+                            <span class="slider-value" id="chinHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="chinSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🧠 Fight IQ Training</span>
+                            <span class="slider-value" id="fightIQHours">8 hrs</span>
+                        </div>
+                        <input type="range" class="slider" id="fightIQSlider" min="0" max="25" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <button class="btn" onclick="submitTraining()" style="width: 100%; margin-top: 20px;">
+                        COMPLETE TRAINING WEEK
+                    </button>
+                </div>
+                
+                <div class="training-effects">
+                    <h3 style="color: var(--warning); margin-bottom: 20px;">⚠️ TRAINING EFFECTS</h3>
+                    <div id="trainingEffects">
+                        <div class="effect-item">
+                            ✅ Balanced training - no penalties
+                        </div>
+                    </div>
+                    
+                    <h3 style="color: var(--success); margin-top: 30px; margin-bottom: 15px;">📈 PROJECTED GAINS</h3>
+                    <div id="projectedGains">
+                        <div style="margin: 10px 0; padding: 10px; background: var(--success)10; border-radius: 8px;">
+                            Calculate gains by allocating training hours
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fight Section -->
+        <div id="fight" class="section">
+            <div class="fight-container">
+                <div class="tactics-panel">
+                    <h3 style="color: var(--primary); margin-bottom: 20px;">⚔️ FIGHT TACTICS</h3>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">📏 Distance Control</span>
+                            <span class="slider-value" id="distanceValue">50</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">
+                            <span>Close Range</span>
+                            <span>Long Range</span>
+                        </div>
+                        <input type="range" class="slider" id="distanceSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">⏱️ Fight Tempo</span>
+                            <span class="slider-value" id="tempoValue">50</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">
+                            <span>Patient</span>
+                            <span>Aggressive</span>
+                        </div>
+                        <input type="range" class="slider" id="tempoSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🥊 Fighting Style</span>
+                            <span class="slider-value" id="tacticsValue">50</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">
+                            <span>Technical</span>
+                            <span>Brawling</span>
+                        </div>
+                        <input type="range" class="slider" id="tacticsSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">🤼 Grappling Intent</span>
+                            <span class="slider-value" id="grappleValue">50</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">
+                            <span>Striking</span>
+                            <span>Wrestling</span>
+                        </div>
+                        <input type="range" class="slider" id="grappleSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                </div>
+                
+                <div class="opponent-panel">
+                    <h3 style="color: var(--danger); margin-bottom: 20px;">🎯 OPPONENT SCOUTING</h3>
+                    <div id="opponentInfo">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">🤖</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">AI FIGHTER</div>
+                            <div style="color: var(--warning); margin: 5px 0;">Boxer Style</div>
+                            <div>Record: 5-3-0</div>
+                        </div>
+                        
+                        <div style="background: var(--danger)10; padding: 15px; border-radius: 10px; border-left: 4px solid var(--danger);">
+                            <strong>Scouting Report:</strong><br>
+                            Aggressive striker with solid fundamentals. Tends to pressure early but fades in later rounds. Weak takedown defense.
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 15px; background: var(--warning)10; border-radius: 10px;">
+                            <strong>Style Matchup:</strong> <span id="styleAdvantage">Neutral</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fight-arena">
+                <div class="fight-header">
+                    <div class="fighter-corner">
+                        <div style="font-weight: 700; color: var(--primary);" id="playerCorner">YOUR FIGHTER</div>
+                        <div style="font-size: 0.9rem; margin-top: 5px;" id="playerRecord">0-0-0</div>
+                    </div>
+                    <div class="vs-indicator">VS</div>
+                    <div class="fighter-corner">
+                        <div style="font-weight: 700; color: var(--danger);">AI FIGHTER</div>
+                        <div style="font-size: 0.9rem; margin-top: 5px;">5-3-0</div>
+                    </div>
+                </div>
+                
+                <div class="health-bars">
+                    <div class="health-bar">
+                        <div id="playerHealth" class="health-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="health-bar">
+                        <div id="opponentHealth" class="health-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn" onclick="simulateFight()" style="font-size: 1.3rem; padding: 20px 40px;">
+                        🥊 ENTER THE OCTAGON
+                    </button>
+                </div>
+                
+                <div class="fight-log" id="fightLog">
+                    <div style="text-align: center; color: var(--gray); font-style: italic;">
+                        Set your tactics and enter the octagon to begin the fight...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- League Section -->
+        <div id="league" class="section">
+            <div class="standings-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>🏆 RANK</th>
+                            <th>👤 FIGHTER</th>
+                            <th>📊 RECORD</th>
+                            <th>⭐ POINTS</th>
+                            <th>💰 EARNINGS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsTable">
+                        <tr class="rank-1">
+                            <td>1</td>
+                            <td><strong>Your Fighter</strong></td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                            <td>$500</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Iron Mike AI</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                            <td>$500</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Thunder Bot</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                            <td>$500</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Cyber Striker</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                            <td>$500</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Digital Destroyer</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                            <td>$500</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: var(--gray); padding: 20px; border-radius: 15px; border: 1px solid var(--primary)30;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">📅 SEASON INFO</h3>
+                    <div>Week: <strong>1 of 12</strong></div>
+                    <div>Season: <strong>1</strong></div>
+                    <div>League: <strong>Proving Grounds Elite</strong></div>
+                </div>
+                
+                <div style="background: var(--gray); padding: 20px; border-radius: 15px; border: 1px solid var(--success)30;">
+                    <h3 style="color: var(--success); margin-bottom: 15px;">🎯 NEXT FIGHT</h3>
+                    <div>Opponent: <strong>Iron Mike AI</strong></div>
+                    <div>Date: <strong>Sunday</strong></div>
+                    <div>Venue: <strong>Digital Arena</strong></div>
+                </div>
+                
+                <div style="background: var(--gray); padding: 20px; border-radius: 15px; border: 1px solid var(--accent)30;">
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">🏆 SEASON GOALS</h3>
+                    <div>Championship: <strong>Top 2 advance</strong></div>
+                    <div>Prize Pool: <strong>$10,000</strong></div>
+                    <div>Bonus: <strong>$500 per win</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Game State with more detailed tracking
+        let gameState = {
+            fighter: {
+                name: "New Fighter",
+                style: "",
+                avatar: "🥊",
+                stats: {
+                    strength: 50,
+                    speed: 50,
+                    skill: 50,
+                    endurance: 50,
+                    chin: 50,
+                    fightIQ: 50
+                },
+                record: { wins: 0, losses: 0, draws: 0 },
+                trainingHours: 50,
+                cash: 500,
+                totalFights: 0,
+                seasonPoints: 0
+            },
+            training: {
+                allocation: {
+                    strength: 8,
+                    speed: 8,
+                    skill: 8,
+                    endurance: 8,
+                    chin: 8,
+                    fightIQ: 8
+                },
+                weekCompleted: false
+            },
+            tactics: {
+                distance: 50,
+                tempo: 50,
+                tactics: 50,
+                grapple: 50
+            },
+            league: {
+                week: 1,
+                season: 1,
+                standings: []
+            }
+        };
+
+        // Style configurations with emojis and bonuses
+        const fightingStyles = {
+            'Boxer': { 
+                emoji: '🥊', 
+                bonuses: { speed: 10, skill: 5 },
+                description: 'Speed & Skill Focus',
+                advantages: ['Kickboxer'],
+                disadvantages: ['Wrestler']
+            },
+            'Wrestler': { 
+                emoji: '🤼', 
+                bonuses: { strength: 10, endurance: 5 },
+                description: 'Strength & Endurance',
+                advantages: ['Boxer'],
+                disadvantages: ['BJJ']
+            },
+            'BJJ': { 
+                emoji: '🥋', 
+                bonuses: { skill: 15 },
+                description: 'Technical Submission Expert',
+                advantages: ['Wrestler'],
+                disadvantages: ['Kickboxer']
+            },
+            'Kickboxer': { 
+                emoji: '🦵', 
+                bonuses: { speed: 5, skill: 5 },
+                description: 'Balanced Striker',
+                advantages: ['BJJ'],
+                disadvantages: ['Boxer']
+            },
+            'Pressure': { 
+                emoji: '💥', 
+                bonuses: { endurance: 10, chin: 5 },
+                description: 'Relentless Aggression',
+                advantages: ['Counter'],
+                disadvantages: ['Pressure']
+            },
+            'Counter': { 
+                emoji: '🎯', 
+                bonuses: { fightIQ: 15 },
+                description: 'Tactical Precision',
+                advantages: ['Pressure'],
+                disadvantages: ['Counter']
+            }
+        };
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Load saved game state
+        function loadGame() {
+            const saved = localStorage.getItem('provingGroundsEnhanced');
+            if (saved) {
+                gameState = { ...gameState, ...JSON.parse(saved) };
+                updateUI();
+            }
+        }
+
+        // Save game state
+        function saveGame() {
+            localStorage.setItem('provingGroundsEnhanced', JSON.stringify(gameState));
+        }
+
+        // Enhanced section switching with animations
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(s => {
+                s.classList.remove('active');
+            });
+            document.querySelectorAll('.nav button').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName).classList.add('active');
+            document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+        }
+
+        // Enhanced fighter creation
+        function createFighter() {
+            const name = document.getElementById('nameInput').value.trim();
+            const style = document.getElementById('styleSelect').value;
+            
+            if (!name) {
+                showNotification('Please enter a fighter name!', 'error');
+                return;
+            }
+            
+            if (!style) {
+                showNotification('Please select a fighting style!', 'error');
+                return;
+            }
+            
+            gameState.fighter.name = name;
+            gameState.fighter.style = style;
+            gameState.fighter.avatar = fightingStyles[style].emoji;
+            
+            // Apply style bonuses with animation
+            applyStyleBonuses(style);
+            updateUI();
+            saveGame();
+            
+            showNotification(`${name} the ${style} has entered the proving grounds!`, 'success');
+        }
+
+        // Enhanced style bonus application
+        function applyStyleBonuses(style) {
+            // Reset to base 50
+            Object.keys(gameState.fighter.stats).forEach(stat => {
+                gameState.fighter.stats[stat] = 50;
+            });
+            
+            // Apply bonuses with visual feedback
+            if (fightingStyles[style] && fightingStyles[style].bonuses) {
+                Object.entries(fightingStyles[style].bonuses).forEach(([stat, bonus]) => {
+                    gameState.fighter.stats[stat] += bonus;
+                });
+            }
+        }
+
+        // Enhanced training system
+        function updateTraining() {
+            const stats = ['strength', 'speed', 'skill', 'endurance', 'chin', 'fightIQ'];
+            let totalHours = 0;
+            
+            stats.forEach(stat => {
+                const value = parseInt(document.getElementById(stat + 'Slider').value);
+                gameState.training.allocation[stat] = value;
+                document.getElementById(stat + 'Hours').textContent = value + ' hrs';
+                totalHours += value;
+            });
+            
+            const available = 50 - totalHours;
+            document.getElementById('availableHours').textContent = available;
+            
+            // Update hours display color based on availability
+            const hoursDisplay = document.querySelector('.hours-available');
+            if (available < 0) {
+                hoursDisplay.style.color = 'var(--danger)';
+            } else if (available === 0) {
+                hoursDisplay.style.color = 'var(--success)';
+            } else {
+                hoursDisplay.style.color = 'var(--accent)';
+            }
+            
+            updateTrainingEffects();
+            updateProjectedGains();
+        }
+
+        // Enhanced training effects
+        function updateTrainingEffects() {
+            const effects = [];
+            const allocation = gameState.training.allocation;
+            
+            if (allocation.strength > 15) {
+                effects.push('⚠️ Heavy strength training: -10% stamina efficiency next fight');
+            }
+            if (allocation.speed > 15) {
+                effects.push('⚠️ Speed focus: -5% power next fight');
+            }
+            if (allocation.endurance > 20) {
+                effects.push('✅ Cardio machine: +15% stamina recovery');
+            }
+            if (allocation.skill > 20) {
+                effects.push('✅ Technical mastery: +10% combo damage');
+            }
+            
+            if (effects.length === 0) {
+                effects.push('✅ Balanced training - no penalties');
+            }
+            
+            document.getElementById('trainingEffects').innerHTML = effects
+                .map(effect => `<div class="effect-item">${effect}</div>`)
+                .join('');
+        }
+
+        // New projected gains calculation
+        function updateProjectedGains() {
+            const gains = [];
+            const allocation = gameState.training.allocation;
+            
+            Object.entries(allocation).forEach(([stat, hours]) => {
+                if (hours > 0) {
+                    const currentStat = gameState.fighter.stats[stat];
+                    const efficiency = calculateTrainingEfficiency(currentStat);
+                    const gain = (hours * efficiency).toFixed(1);
+                    const emoji = getStatEmoji(stat);
+                    gains.push(`${emoji} ${stat.toUpperCase()}: +${gain}`);
+                }
+            });
+            
+            document.getElementById('projectedGains').innerHTML = gains
+                .map(gain => `<div style="margin: 5px 0; padding: 8px; background: var(--success)10; border-radius: 5px; font-size: 0.9rem;">${gain}</div>`)
+                .join('') || '<div style="color: var(--gray);">No training allocated</div>';
+        }
+
+        function getStatEmoji(stat) {
+            const emojis = {
+                strength: '💪',
+                speed: '⚡',
+                skill: '🎯',
+                endurance: '🫁',
+                chin: '🛡️',
+                fightIQ: '🧠'
+            };
+            return emojis[stat] || '📊';
+        }
+
+        // Enhanced training submission
+        function submitTraining() {
+            const allocation = gameState.training.allocation;
+            const totalHours = Object.values(allocation).reduce((sum, hours) => sum + hours, 0);
+            
+            if (totalHours > 50) {
+                showNotification('Cannot exceed 50 training hours!', 'error');
+                return;
+            }
+            
+            if (totalHours === 0) {
+                showNotification('You must allocate at least some training hours!', 'warning');
+                return;
+            }
+            
+            // Apply training gains with animation
+            let totalGains = 0;
+            Object.entries(allocation).forEach(([stat, hours]) => {
+                if (hours > 0) {
+                    const currentStat = gameState.fighter.stats[stat];
+                    const efficiency = calculateTrainingEfficiency(currentStat);
+                    const gain = hours * efficiency;
+                    gameState.fighter.stats[stat] = Math.min(100, currentStat + gain);
+                    totalGains += gain;
+                }
+            });
+            
+            gameState.training.weekCompleted = true;
+            updateUI();
+            saveGame();
+            
+            showNotification(`Training week completed! Total stat gains: +${totalGains.toFixed(1)}`, 'success');
+            
+            // Animate stat bars
+            setTimeout(() => {
+                Object.keys(gameState.fighter.stats).forEach(stat => {
+                    const bar = document.getElementById(stat + 'Bar');
+                    if (bar) {
+                        bar.style.transition = 'width 1.5s ease-out';
+                    }
+                });
+            }, 100);
+        }
+
+        // Enhanced training efficiency with diminishing returns
+        function calculateTrainingEfficiency(currentStat) {
+            if (currentStat < 60) return 0.6;
+            if (currentStat < 70) return 0.4;
+            if (currentStat < 80) return 0.25;
+            if (currentStat < 90) return 0.15;
+            return 0.08;
+        }
+
+        // Enhanced tactics system
+        function updateTactics() {
+            const tactics = ['distance', 'tempo', 'tactics', 'grapple'];
+            
+            tactics.forEach(tactic => {
+                const value = parseInt(document.getElementById(tactic + 'Slider').value);
+                gameState.tactics[tactic] = value;
+                document.getElementById(tactic + 'Value').textContent = value;
+            });
+            
+            updateStyleAdvantage();
+        }
+
+        // New style advantage calculation
+        function updateStyleAdvantage() {
+            const playerStyle = gameState.fighter.style;
+            const opponentStyle = 'Boxer'; // AI opponent style
+            
+            if (!playerStyle) {
+                document.getElementById('styleAdvantage').textContent = 'Create fighter first';
+                return;
+            }
+            
+            const advantages = fightingStyles[playerStyle]?.advantages || [];
+            const disadvantages = fightingStyles[playerStyle]?.disadvantages || [];
+            
+            let advantage = 'Neutral (0%)';
+            let color = 'var(--accent)';
+            
+            if (advantages.includes(opponentStyle)) {
+                advantage = 'Advantage (+15%)';
+                color = 'var(--success)';
+            } else if (disadvantages.includes(opponentStyle)) {
+                advantage = 'Disadvantage (-15%)';
+                color = 'var(--danger)';
+            }
+            
+            const advantageElement = document.getElementById('styleAdvantage');
+            advantageElement.textContent = advantage;
+            advantageElement.style.color = color;
+            advantageElement.style.fontWeight = '700';
+        }
+
+        // Enhanced fight simulation
+        function simulateFight() {
+            if (!gameState.fighter.name || !gameState.fighter.style) {
+                showNotification('Create your fighter first!', 'error');
+                return;
+            }
+            
+            const fighter = gameState.fighter;
+            const opponent = generateEnhancedOpponent();
+            
+            // Clear previous fight log
+            const fightLog = document.getElementById('fightLog');
+            fightLog.innerHTML = '<div class="log-round">🥊 FIGHT BEGINNING...</div>';
+            
+            // Simulate fight with enhanced visuals
+            setTimeout(() => {
+                const result = runEnhancedFightSimulation(fighter, opponent, gameState.tactics);
+                displayEnhancedFightResult(result);
+                updateRecord(result.winner === 'player');
+                updateLeagueStandings(result);
+                saveGame();
+            }, 1000);
+        }
+
+        // Enhanced opponent generation
+        function generateEnhancedOpponent() {
+            const styles = Object.keys(fightingStyles);
+            const style = styles[Math.floor(Math.random() * styles.length)];
+            const names = ['Iron Mike AI', 'Thunder Bot', 'Cyber Striker', 'Digital Destroyer', 'Quantum Fighter'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            
+            return {
+                name: name,
+                style: style,
+                stats: {
+                    strength: 45 + Math.random() * 25,
+                    speed: 45 + Math.random() * 25,
+                    skill: 45 + Math.random() * 25,
+                    endurance: 45 + Math.random() * 25,
+                    chin: 45 + Math.random() * 25,
+                    fightIQ: 45 + Math.random() * 25
+                }
+            };
+        }
+
+        // Enhanced fight simulation with real-time updates
+        function runEnhancedFightSimulation(fighter, opponent, tactics) {
+            const log = [];
+            let fighterHP = 100;
+            let opponentHP = 100;
+            let fighterStamina = 100;
+            let opponentStamina = 100;
+            
+            // Simulate 3 rounds with enhanced detail
+            for (let round = 1; round <= 3; round++) {
+                log.push({
+                    type: 'round',
+                    content: `=== ROUND ${round} ===`,
+                    round: round
+                });
+                
+                // 5 phases per round with more detailed actions
+                for (let phase = 1; phase <= 5; phase++) {
+                    // Fighter action
+                    const fighterAction = selectEnhancedAction(fighter, tactics, fighterStamina);
+                    const fighterDamage = calculateEnhancedDamage(fighter, opponent, fighterAction, tactics);
+                    
+                    if (fighterDamage > 0) {
+                        opponentHP -= fighterDamage;
+                        fighterStamina -= getStaminaCost(fighterAction);
+                        
+                        log.push({
+                            type: 'action',
+                            content: `${fighter.name} ${fighterAction.description} for ${fighterDamage.toFixed(1)} damage!`,
+                            damage: fighterDamage,
+                            attacker: 'player'
+                        });
+                        
+                        // Update health bar in real-time
+                        updateHealthBar('opponent', opponentHP);
+                    }
+                    
+                    if (opponentHP <= 0) {
+                        log.push({
+                            type: 'finish',
+                            content: `💥 ${opponent.name} is KNOCKED OUT! ${fighter.name} wins by KO!`,
+                            winner: 'player'
+                        });
+                        return { winner: 'player', method: 'KO', round, log, fighterHP, opponentHP };
+                    }
+                    
+                    // Opponent action
+                    const opponentTactics = generateOpponentTactics(opponent);
+                    const opponentAction = selectEnhancedAction(opponent, opponentTactics, opponentStamina);
+                    const opponentDamage = calculateEnhancedDamage(opponent, fighter, opponentAction, opponentTactics);
+                    
+                    if (opponentDamage > 0) {
+                        fighterHP -= opponentDamage;
+                        opponentStamina -= getStaminaCost(opponentAction);
+                        
+                        log.push({
+                            type: 'action',
+                            content: `${opponent.name} ${opponentAction.description} for ${opponentDamage.toFixed(1)} damage!`,
+                            damage: opponentDamage,
+                            attacker: 'opponent'
+                        });
+                        
+                        // Update health bar in real-time
+                        updateHealthBar('player', fighterHP);
+                    }
+                    
+                    if (fighterHP <= 0) {
+                        log.push({
+                            type: 'finish',
+                            content: `💥 ${fighter.name} is KNOCKED OUT! ${opponent.name} wins by KO!`,
+                            winner: 'opponent'
+                        });
+                        return { winner: 'opponent', method: 'KO', round, log, fighterHP, opponentHP };
+                    }
+                }
+                
+                // End of round recovery
+                fighterStamina = Math.min(100, fighterStamina + 25);
+                opponentStamina = Math.min(100, opponentStamina + 25);
+                
+                log.push({
+                    type: 'round_end',
+                    content: `End of Round ${round} - ${fighter.name}: ${fighterHP.toFixed(1)} HP | ${opponent.name}: ${opponentHP.toFixed(1)} HP`,
+                    fighterHP,
+                    opponentHP
+                });
+            }
+            
+            // Decision
+            const winner = fighterHP > opponentHP ? 'player' : 'opponent';
+            const winnerName = winner === 'player' ? fighter.name : opponent.name;
+            
+            log.push({
+                type: 'decision',
+                content: `⚖️ UNANIMOUS DECISION - Winner: ${winnerName}`,
+                winner
+            });
+            
+            return { winner, method: 'Decision', round: 3, log, fighterHP, opponentHP };
+        }
+
+        // Enhanced action selection
+        function selectEnhancedAction(fighter, tactics, stamina) {
+            const actions = [
+                { name: 'jab', description: 'lands a sharp jab', damage: 0.8, stamina: 5 },
+                { name: 'cross', description: 'throws a powerful cross', damage: 1.2, stamina: 8 },
+                { name: 'hook', description: 'connects with a hook', damage: 1.0, stamina: 7 },
+                { name: 'uppercut', description: 'lands an uppercut', damage: 1.4, stamina: 10 },
+                { name: 'kick', description: 'scores with a leg kick', damage: 1.1, stamina: 9 },
+                { name: 'takedown', description: 'secures a takedown', damage: 0.9, stamina: 12 },
+                { name: 'combo', description: 'unleashes a combination', damage: 1.6, stamina: 15 }
+            ];
+            
+            // Filter actions based on stamina and tactics
+            const availableActions = actions.filter(action => stamina >= action.stamina);
+            
+            if (availableActions.length === 0) {
+                return { name: 'rest', description: 'catches their breath', damage: 0, stamina: -5 };
+            }
+            
+            // Weight actions based on tactics and style
+            const weightedActions = availableActions.map(action => ({
+                ...action,
+                weight: calculateActionWeight(action, tactics, fighter.style)
+            }));
+            
+            return weightedRandom(weightedActions);
+        }
+
+        function calculateActionWeight(action, tactics, style) {
+            let weight = 1;
+            
+            // Adjust based on tactics
+            if (action.name === 'takedown' || action.name === 'combo') {
+                weight *= (tactics.grapple / 100) + 0.5;
+            }
+            if (action.damage > 1.2) {
+                weight *= (tactics.tempo / 100) + 0.5;
+            }
+            
+            // Adjust based on style
+            const styleBonus = {
+                'Boxer': { jab: 1.5, cross: 1.3, hook: 1.2 },
+                'Wrestler': { takedown: 2.0, combo: 1.3 },
+                'Kickboxer': { kick: 1.8, combo: 1.2 },
+                'BJJ': { takedown: 1.5, combo: 1.4 },
+                'Pressure': { combo: 1.6, hook: 1.3 },
+                'Counter': { uppercut: 1.4, cross: 1.2 }
+            };
+            
+            if (styleBonus[style] && styleBonus[style][action.name]) {
+                weight *= styleBonus[style][action.name];
+            }
+            
+            return weight;
+        }
+
+        function weightedRandom(items) {
+            const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const item of items) {
+                random -= item.weight;
+                if (random <= 0) return item;
+            }
+            
+            return items[0];
+        }
+
+        // Enhanced damage calculation
+        function calculateEnhancedDamage(attacker, defender, action, tactics) {
+            if (action.damage === 0) return 0;
+            
+            const baseDamage = (attacker.stats.strength * 0.4 + attacker.stats.skill * 0.3) * action.damage;
+            const accuracy = Math.max(0.1, (attacker.stats.speed - defender.stats.speed + 60) / 120);
+            const defense = defender.stats.chin * 0.5 + defender.stats.skill * 0.2;
+            
+            let damage = baseDamage * accuracy - defense;
+            
+            // Apply style bonuses
+            damage *= getStyleMultiplier(attacker.style, defender.style);
+            
+            // Apply tactics modifiers
+            if (tactics.tactics > 70) damage *= 1.15; // Brawling bonus
+            if (tactics.tempo > 80) damage *= 1.1; // Aggressive bonus
+            
+            // Random variance
+            damage *= (0.8 + Math.random() * 0.4);
+            
+            return Math.max(0, damage);
+        }
+
+        function getStyleMultiplier(attackerStyle, defenderStyle) {
+            const advantages = fightingStyles[attackerStyle]?.advantages || [];
+            const disadvantages = fightingStyles[attackerStyle]?.disadvantages || [];
+            
+            if (advantages.includes(defenderStyle)) return 1.15;
+            if (disadvantages.includes(defenderStyle)) return 0.85;
+            return 1.0;
+        }
+
+        function getStaminaCost(action) {
+            return action.stamina || 8;
+        }
+
+        function generateOpponentTactics(opponent) {
+            // Generate tactics based on opponent style
+            const baseTactics = {
+                distance: 50 + (Math.random() - 0.5) * 40,
+                tempo: 50 + (Math.random() - 0.5) * 40,
+                tactics: 50 + (Math.random() - 0.5) * 40,
+                grapple: 50 + (Math.random() - 0.5) * 40
+            };
+            
+            // Adjust based on style
+            const styleAdjustments = {
+                'Boxer': { distance: 70, tempo: 60 },
+                'Wrestler': { grapple: 80, tempo: 70 },
+                'BJJ': { grapple: 85, tactics: 30 },
+                'Kickboxer': { distance: 80, tactics: 40 },
+                'Pressure': { tempo: 90, tactics: 80 },
+                'Counter': { tempo: 30, tactics: 20 }
+            };
+            
+            if (styleAdjustments[opponent.style]) {
+                Object.assign(baseTactics, styleAdjustments[opponent.style]);
+            }
+            
+            return baseTactics;
+        }
+
+        // Real-time health bar updates
+        function updateHealthBar(fighter, health) {
+            const healthBar = document.getElementById(fighter === 'player' ? 'playerHealth' : 'opponentHealth');
+            if (healthBar) {
+                healthBar.style.width = Math.max(0, health) + '%';
+                
+                // Change color based on health
+                if (health > 70) {
+                    healthBar.style.background = 'linear-gradient(90deg, var(--success), #00cc66)';
+                } else if (health > 30) {
+                    healthBar.style.background = 'linear-gradient(90deg, var(--warning), #ffcc00)';
+                } else {
+                    healthBar.style.background = 'linear-gradient(90deg, var(--danger), #cc0033)';
+                }
+            }
+        }
+
+        // Enhanced fight result display
+        function displayEnhancedFightResult(result) {
+            const fightLog = document.getElementById('fightLog');
+            
+            // Clear and rebuild log with animations
+            fightLog.innerHTML = '';
+            
+            result.log.forEach((entry, index) => {
+                setTimeout(() => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    
+                    if (entry.type === 'round') {
+                        logEntry.className += ' log-round';
+                    } else if (entry.type === 'action' && entry.damage > 15) {
+                        logEntry.className += ' log-damage';
+                    }
+                    
+                    logEntry.textContent = entry.content;
+                    fightLog.appendChild(logEntry);
+                    fightLog.scrollTop = fightLog.scrollHeight;
+                }, index * 200);
+            });
+        }
+
+        // Enhanced record updating
+        function updateRecord(won) {
+            if (won) {
+                gameState.fighter.record.wins++;
+                gameState.fighter.cash += 200;
+                gameState.fighter.seasonPoints += 3;
+                showNotification('Victory! +$200 earned, +3 points!', 'success');
+            } else {
+                gameState.fighter.record.losses++;
+                gameState.fighter.cash += 100;
+                showNotification('Defeat! +$100 show money earned.', 'warning');
+            }
+            
+            gameState.fighter.totalFights++;
+            updateUI();
+        }
+
+        // New league standings update
+        function updateLeagueStandings(result) {
+            // Update league standings (simplified for demo)
+            const standings = document.getElementById('standingsTable');
+            const playerRow = standings.querySelector('tr');
+            
+            if (playerRow) {
+                const cells = playerRow.querySelectorAll('td');
+                cells[2].textContent = `${gameState.fighter.record.wins}-${gameState.fighter.record.losses}-${gameState.fighter.record.draws}`;
+                cells[3].textContent = gameState.fighter.seasonPoints;
+                cells[4].textContent = `$${gameState.fighter.cash}`;
+            }
+        }
+
+        // Enhanced UI updates with animations
+        function updateUI() {
+            const fighter = gameState.fighter;
+            
+            // Update fighter info
+            document.getElementById('fighterName').textContent = fighter.name || 'Create Your Fighter';
+            document.getElementById('fighterStyle').textContent = fighter.style ? 
+                `${fightingStyles[fighter.style].emoji} ${fighter.style} - ${fightingStyles[fighter.style].description}` : 
+                'Select Style';
+            document.getElementById('fighterAvatar').textContent = fighter.avatar;
+            document.getElementById('record').textContent = `${fighter.record.wins}-${fighter.record.losses}-${fighter.record.draws}`;
+            document.getElementById('cash').textContent = fighter.cash;
+            
+            // Update corner info
+            document.getElementById('playerCorner').textContent = fighter.name || 'YOUR FIGHTER';
+            document.getElementById('playerRecord').textContent = `${fighter.record.wins}-${fighter.record.losses}-${fighter.record.draws}`;
+            
+            // Update stats with smooth animations
+            Object.entries(fighter.stats).forEach(([stat, value]) => {
+                const valueElement = document.getElementById(stat + 'Value');
+                const barElement = document.getElementById(stat + 'Bar');
+                
+                if (valueElement && barElement) {
+                    valueElement.textContent = Math.round(value);
+                    barElement.style.width = Math.min(100, value) + '%';
+                    
+                    // Color coding based on stat level
+                    if (value >= 80) {
+                        barElement.style.background = 'linear-gradient(90deg, var(--success), #00ff88)';
+                    } else if (value >= 60) {
+                        barElement.style.background = 'linear-gradient(90deg, var(--primary), var(--accent))';
+                    } else {
+                        barElement.style.background = 'linear-gradient(90deg, var(--warning), #ffcc00)';
+                    }
+                }
+            });
+            
+            // Update style advantage
+            updateStyleAdvantage();
+        }
+
+        // Initialize enhanced game
+        function initializeGame() {
+            loadGame();
+            updateUI();
+            updateTraining();
+            updateTactics();
+            
+            // Add some initial animations
+            setTimeout(() => {
+                document.querySelectorAll('.stat-fill').forEach(bar => {
+                    bar.style.transition = 'width 1s ease-out';
+                });
+            }, 500);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeGame);
+        
+        // Auto-save every 30 seconds
+        setInterval(saveGame, 30000);
+    </script>
+</body>
+</html>
