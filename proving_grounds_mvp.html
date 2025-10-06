@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proving Grounds MVP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .nav { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .nav button { padding: 10px 20px; background: #333; color: #fff; border: none; cursor: pointer; }
+        .nav button.active { background: #007acc; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .fighter-card { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-item { background: #333; padding: 15px; border-radius: 5px; text-align: center; }
+        .slider-container { margin: 10px 0; }
+        .slider { width: 100%; margin: 5px 0; }
+        .training-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .fight-log { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+        .standings { background: #2a2a2a; padding: 20px; border-radius: 8px; }
+        .standings table { width: 100%; border-collapse: collapse; }
+        .standings th, .standings td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
+        input, select, button { padding: 8px; margin: 5px; background: #333; color: #fff; border: 1px solid #555; }
+        button { cursor: pointer; }
+        button:hover { background: #555; }
+        .progress-bar { background: #333; height: 20px; border-radius: 10px; overflow: hidden; margin: 5px 0; }
+        .progress-fill { background: #007acc; height: 100%; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Proving Grounds</h1>
+            <p>Fantasy Combat Sports Management</p>
+        </div>
+
+        <div class="nav">
+            <button onclick="showSection('fighter')" class="active">Fighter</button>
+            <button onclick="showSection('training')">Training</button>
+            <button onclick="showSection('fight')">Fight</button>
+            <button onclick="showSection('league')">League</button>
+        </div>
+
+        <!-- Fighter Section -->
+        <div id="fighter" class="section active">
+            <h2>Fighter Management</h2>
+            <div class="fighter-card">
+                <h3 id="fighterName">Create Your Fighter</h3>
+                <div style="margin: 20px 0;">
+                    <input type="text" id="nameInput" placeholder="Fighter Name" maxlength="20">
+                    <select id="styleSelect">
+                        <option value="Boxer">Boxer</option>
+                        <option value="Wrestler">Wrestler</option>
+                        <option value="BJJ">BJJ</option>
+                        <option value="Kickboxer">Kickboxer</option>
+                        <option value="Pressure">Pressure</option>
+                        <option value="Counter">Counter</option>
+                    </select>
+                    <button onclick="createFighter()">Create Fighter</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h4>Strength</h4>
+                        <div class="progress-bar">
+                            <div id="strengthBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="strengthValue">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Speed</h4>
+                        <div class="progress-bar">
+                            <div id="speedBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="speedValue">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Skill</h4>
+                        <div class="progress-bar">
+                            <div id="skillBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="skillValue">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Endurance</h4>
+                        <div class="progress-bar">
+                            <div id="enduranceBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="enduranceValue">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Chin</h4>
+                        <div class="progress-bar">
+                            <div id="chinBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="chinValue">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Fight IQ</h4>
+                        <div class="progress-bar">
+                            <div id="fightIQBar" class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <span id="fightIQValue">50</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p><strong>Record:</strong> <span id="record">0-0-0</span></p>
+                    <p><strong>Training Hours:</strong> <span id="trainingHours">50</span></p>
+                    <p><strong>Cash:</strong> $<span id="cash">500</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Section -->
+        <div id="training" class="section">
+            <h2>Training Camp</h2>
+            <div class="training-grid">
+                <div>
+                    <h3>Allocate Training Hours</h3>
+                    <p>Available Hours: <span id="availableHours">50</span></p>
+                    
+                    <div class="slider-container">
+                        <label>Strength: <span id="strengthHours">8</span> hours</label>
+                        <input type="range" class="slider" id="strengthSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Speed: <span id="speedHours">8</span> hours</label>
+                        <input type="range" class="slider" id="speedSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Skill: <span id="skillHours">8</span> hours</label>
+                        <input type="range" class="slider" id="skillSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Endurance: <span id="enduranceHours">8</span> hours</label>
+                        <input type="range" class="slider" id="enduranceSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Chin: <span id="chinHours">8</span> hours</label>
+                        <input type="range" class="slider" id="chinSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Fight IQ: <span id="fightIQHours">8</span> hours</label>
+                        <input type="range" class="slider" id="fightIQSlider" min="0" max="20" value="8" oninput="updateTraining()">
+                    </div>
+                    
+                    <button onclick="submitTraining()">Submit Training</button>
+                </div>
+                
+                <div>
+                    <h3>Training Effects</h3>
+                    <div id="trainingEffects">
+                        <p>Balanced training - no penalties</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fight Section -->
+        <div id="fight" class="section">
+            <h2>Fight Preparation</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3>Fight Tactics</h3>
+                    
+                    <div class="slider-container">
+                        <label>Distance: <span id="distanceValue">50</span> (Close ← → Long Range)</label>
+                        <input type="range" class="slider" id="distanceSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Tempo: <span id="tempoValue">50</span> (Patient ← → Aggressive)</label>
+                        <input type="range" class="slider" id="tempoSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Tactics: <span id="tacticsValue">50</span> (Technical ← → Brawling)</label>
+                        <input type="range" class="slider" id="tacticsSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label>Grappling: <span id="grappleValue">50</span> (Striking ← → Wrestling)</label>
+                        <input type="range" class="slider" id="grappleSlider" min="0" max="100" value="50" oninput="updateTactics()">
+                    </div>
+                    
+                    <button onclick="simulateFight()">Simulate Fight</button>
+                </div>
+                
+                <div>
+                    <h3>Opponent Scouting</h3>
+                    <div id="opponentInfo">
+                        <p><strong>Opponent:</strong> AI Fighter</p>
+                        <p><strong>Style:</strong> Boxer</p>
+                        <p><strong>Record:</strong> 5-3-0</p>
+                        <p><strong>Tendencies:</strong> Aggressive striker, weak ground game</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fight-log" id="fightLog">
+                <h3>Fight Results</h3>
+                <p>Set your tactics and simulate a fight to see results...</p>
+            </div>
+        </div>
+
+        <!-- League Section -->
+        <div id="league" class="section">
+            <h2>League Standings</h2>
+            <div class="standings">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Fighter</th>
+                            <th>Record</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsTable">
+                        <tr>
+                            <td>1</td>
+                            <td>Your Fighter</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>AI Fighter 1</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>AI Fighter 2</td>
+                            <td>0-0-0</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            fighter: {
+                name: "New Fighter",
+                style: "Boxer",
+                stats: {
+                    strength: 50,
+                    speed: 50,
+                    skill: 50,
+                    endurance: 50,
+                    chin: 50,
+                    fightIQ: 50
+                },
+                record: { wins: 0, losses: 0, draws: 0 },
+                trainingHours: 50,
+                cash: 500
+            },
+            training: {
+                allocation: {
+                    strength: 8,
+                    speed: 8,
+                    skill: 8,
+                    endurance: 8,
+                    chin: 8,
+                    fightIQ: 8
+                }
+            },
+            tactics: {
+                distance: 50,
+                tempo: 50,
+                tactics: 50,
+                grapple: 50
+            }
+        };
+
+        // Load saved game state
+        function loadGame() {
+            const saved = localStorage.getItem('provingGrounds');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                updateUI();
+            }
+        }
+
+        // Save game state
+        function saveGame() {
+            localStorage.setItem('provingGrounds', JSON.stringify(gameState));
+        }
+
+        // Show section
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Create fighter
+        function createFighter() {
+            const name = document.getElementById('nameInput').value || 'New Fighter';
+            const style = document.getElementById('styleSelect').value;
+            
+            gameState.fighter.name = name;
+            gameState.fighter.style = style;
+            
+            // Apply style bonuses
+            applyStyleBonuses(style);
+            updateUI();
+            saveGame();
+        }
+
+        // Apply style bonuses
+        function applyStyleBonuses(style) {
+            const bonuses = {
+                'Boxer': { speed: 10, skill: 5 },
+                'Wrestler': { strength: 10, endurance: 5 },
+                'BJJ': { skill: 15 },
+                'Kickboxer': { speed: 5, skill: 5 },
+                'Pressure': { endurance: 10, chin: 5 },
+                'Counter': { fightIQ: 15 }
+            };
+            
+            // Reset to base 50
+            Object.keys(gameState.fighter.stats).forEach(stat => {
+                gameState.fighter.stats[stat] = 50;
+            });
+            
+            // Apply bonuses
+            if (bonuses[style]) {
+                Object.entries(bonuses[style]).forEach(([stat, bonus]) => {
+                    gameState.fighter.stats[stat] += bonus;
+                });
+            }
+        }
+
+        // Update training allocation
+        function updateTraining() {
+            const stats = ['strength', 'speed', 'skill', 'endurance', 'chin', 'fightIQ'];
+            let totalHours = 0;
+            
+            stats.forEach(stat => {
+                const value = parseInt(document.getElementById(stat + 'Slider').value);
+                gameState.training.allocation[stat] = value;
+                document.getElementById(stat + 'Hours').textContent = value;
+                totalHours += value;
+            });
+            
+            document.getElementById('availableHours').textContent = 50 - totalHours;
+            
+            // Update training effects
+            updateTrainingEffects();
+        }
+
+        // Update training effects
+        function updateTrainingEffects() {
+            const effects = [];
+            const allocation = gameState.training.allocation;
+            
+            if (allocation.strength > 15) {
+                effects.push("Heavy strength training: -10% stamina efficiency next fight");
+            }
+            if (allocation.speed > 15) {
+                effects.push("Speed focus: -5% power next fight");
+            }
+            if (effects.length === 0) {
+                effects.push("Balanced training - no penalties");
+            }
+            
+            document.getElementById('trainingEffects').innerHTML = effects.map(e => `<p>${e}</p>`).join('');
+        }
+
+        // Submit training
+        function submitTraining() {
+            const allocation = gameState.training.allocation;
+            const totalHours = Object.values(allocation).reduce((sum, hours) => sum + hours, 0);
+            
+            if (totalHours > 50) {
+                alert('Cannot exceed 50 training hours!');
+                return;
+            }
+            
+            // Apply training gains
+            Object.entries(allocation).forEach(([stat, hours]) => {
+                const currentStat = gameState.fighter.stats[stat];
+                const efficiency = calculateTrainingEfficiency(currentStat);
+                const gain = hours * efficiency;
+                gameState.fighter.stats[stat] = Math.min(100, currentStat + gain);
+            });
+            
+            updateUI();
+            saveGame();
+            alert('Training completed! Stats updated.');
+        }
+
+        // Calculate training efficiency
+        function calculateTrainingEfficiency(currentStat) {
+            if (currentStat < 60) return 0.5;
+            if (currentStat < 80) return 0.3;
+            return 0.1;
+        }
+
+        // Update fight tactics
+        function updateTactics() {
+            const tactics = ['distance', 'tempo', 'tactics', 'grapple'];
+            
+            tactics.forEach(tactic => {
+                const value = parseInt(document.getElementById(tactic + 'Slider').value);
+                gameState.tactics[tactic] = value;
+                document.getElementById(tactic + 'Value').textContent = value;
+            });
+        }
+
+        // Simulate fight
+        function simulateFight() {
+            const fighter = gameState.fighter;
+            const opponent = generateOpponent();
+            const result = runFightSimulation(fighter, opponent, gameState.tactics);
+            
+            displayFightResult(result);
+            updateRecord(result.winner === 'player');
+            saveGame();
+        }
+
+        // Generate AI opponent
+        function generateOpponent() {
+            const styles = ['Boxer', 'Wrestler', 'BJJ', 'Kickboxer', 'Pressure', 'Counter'];
+            const style = styles[Math.floor(Math.random() * styles.length)];
+            
+            return {
+                name: 'AI Fighter',
+                style: style,
+                stats: {
+                    strength: 45 + Math.random() * 20,
+                    speed: 45 + Math.random() * 20,
+                    skill: 45 + Math.random() * 20,
+                    endurance: 45 + Math.random() * 20,
+                    chin: 45 + Math.random() * 20,
+                    fightIQ: 45 + Math.random() * 20
+                }
+            };
+        }
+
+        // Run fight simulation
+        function runFightSimulation(fighter, opponent, tactics) {
+            const log = [];
+            let fighterHP = 100;
+            let opponentHP = 100;
+            let fighterStamina = 100;
+            let opponentStamina = 100;
+            
+            // Simulate 3 rounds
+            for (let round = 1; round <= 3; round++) {
+                log.push(`\n=== ROUND ${round} ===`);
+                
+                // 5 phases per round
+                for (let phase = 1; phase <= 5; phase++) {
+                    // Fighter action
+                    const fighterAction = selectAction(fighter, tactics);
+                    const fighterDamage = calculateDamage(fighter, opponent, fighterAction);
+                    opponentHP -= fighterDamage;
+                    fighterStamina -= 8;
+                    
+                    if (fighterDamage > 0) {
+                        log.push(`${fighter.name} ${fighterAction} for ${fighterDamage.toFixed(1)} damage`);
+                    }
+                    
+                    if (opponentHP <= 0) {
+                        log.push(`${opponent.name} is knocked out!`);
+                        return { winner: 'player', method: 'KO', round, log };
+                    }
+                    
+                    // Opponent action
+                    const opponentTactics = { distance: 50, tempo: 60, tactics: 40, grapple: 30 };
+                    const opponentAction = selectAction(opponent, opponentTactics);
+                    const opponentDamage = calculateDamage(opponent, fighter, opponentAction);
+                    fighterHP -= opponentDamage;
+                    opponentStamina -= 8;
+                    
+                    if (opponentDamage > 0) {
+                        log.push(`${opponent.name} ${opponentAction} for ${opponentDamage.toFixed(1)} damage`);
+                    }
+                    
+                    if (fighterHP <= 0) {
+                        log.push(`${fighter.name} is knocked out!`);
+                        return { winner: 'opponent', method: 'KO', round, log };
+                    }
+                }
+                
+                // End of round
+                fighterStamina = Math.min(100, fighterStamina + 20);
+                opponentStamina = Math.min(100, opponentStamina + 20);
+                log.push(`End of round ${round} - ${fighter.name}: ${fighterHP.toFixed(1)} HP, ${opponent.name}: ${opponentHP.toFixed(1)} HP`);
+            }
+            
+            // Decision
+            const winner = fighterHP > opponentHP ? 'player' : 'opponent';
+            log.push(`\nFight goes to decision - Winner: ${winner === 'player' ? fighter.name : opponent.name}`);
+            
+            return { winner, method: 'Decision', round: 3, log };
+        }
+
+        // Select action based on tactics
+        function selectAction(fighter, tactics) {
+            const actions = ['strikes', 'grapples', 'defends'];
+            const weights = [
+                (100 - tactics.grapple) * 0.01,
+                tactics.grapple * 0.01,
+                (100 - tactics.tempo) * 0.01
+            ];
+            
+            const random = Math.random();
+            let cumulative = 0;
+            
+            for (let i = 0; i < actions.length; i++) {
+                cumulative += weights[i];
+                if (random < cumulative) {
+                    return actions[i];
+                }
+            }
+            
+            return actions[0];
+        }
+
+        // Calculate damage
+        function calculateDamage(attacker, defender, action) {
+            if (action === 'defends') return 0;
+            
+            const baseDamage = attacker.stats.strength * 0.3 + attacker.stats.skill * 0.2;
+            const accuracy = (attacker.stats.speed - defender.stats.speed + 50) / 100;
+            const defense = defender.stats.chin * 0.4;
+            
+            let damage = baseDamage * accuracy - defense;
+            damage *= (0.85 + Math.random() * 0.3); // ±15% variance
+            
+            return Math.max(0, damage);
+        }
+
+        // Display fight result
+        function displayFightResult(result) {
+            const logElement = document.getElementById('fightLog');
+            logElement.innerHTML = `<h3>Fight Results</h3><pre>${result.log.join('\n')}</pre>`;
+        }
+
+        // Update fighter record
+        function updateRecord(won) {
+            if (won) {
+                gameState.fighter.record.wins++;
+                gameState.fighter.cash += 150;
+            } else {
+                gameState.fighter.record.losses++;
+                gameState.fighter.cash += 100;
+            }
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            const fighter = gameState.fighter;
+            
+            // Fighter info
+            document.getElementById('fighterName').textContent = fighter.name;
+            document.getElementById('record').textContent = `${fighter.record.wins}-${fighter.record.losses}-${fighter.record.draws}`;
+            document.getElementById('trainingHours').textContent = fighter.trainingHours;
+            document.getElementById('cash').textContent = fighter.cash;
+            
+            // Stats
+            Object.entries(fighter.stats).forEach(([stat, value]) => {
+                document.getElementById(stat + 'Value').textContent = Math.round(value);
+                document.getElementById(stat + 'Bar').style.width = value + '%';
+            });
+        }
+
+        // Initialize game
+        loadGame();
+        updateUI();
+    </script>
+</body>
+</html>
